@@ -33,26 +33,77 @@ const findBookBtn = document.createElement('button');
 findBookBtn.classList.add('btn', 'find-btn');
 findBookBtn.textContent = 'Найти';
 
+const booksList = document.createElement('ul');
+booksList.classList.add('books-list');
+
 btnsWrapper.append(addBookBtn, findBookBtn);
-page.append(pageHeader, btnsWrapper);
+page.append(pageHeader, btnsWrapper, booksList);
 
 function renderLibraryList(arr) {
   if (!arr || !Array.isArray(arr)) {
     return;
   }
 
-  const booksList = document.createElement('ul');
-  booksList.classList.add('books-list');
+  booksList.innerHTML = '';
+  const documentFragment = document.createDocumentFragment();
 
-  for (let i = 0; i < arr.length; i++) {
+  arr.forEach((book, index) => {
     const booksItem = document.createElement('li');
     booksItem.classList.add('books-item');
-    booksItem.textContent = `${i + 1}) ${arr[i]}`;
+    booksItem.textContent = `${index + 1}) ${book}`;
 
-    booksList.append(booksItem);
-  }
+    documentFragment.append(booksItem);
+  });
 
-  page.append(booksList);
+  booksList.append(documentFragment);
 }
 
 renderLibraryList(books);
+
+addBookBtn.addEventListener('click', () => {
+  const input = prompt('Введи название книги');
+
+  if (input === null) {
+    return;
+  }
+
+  if (input.trim() === '') {
+    alert('Название книги не введено!');
+    return;
+  }
+
+  let bookName = input.trim().toLowerCase();
+  bookName = bookName[0].toUpperCase() + bookName.slice(1);
+
+  books.push(bookName);
+  renderLibraryList(books);
+});
+
+findBookBtn.addEventListener('click', () => {
+  const input = prompt('Введи название книги для поиска');
+
+  if (input === null) {
+    return;
+  }
+
+  if (input.trim() === '') {
+    alert('Название книги не введено!');
+    return;
+  }
+
+  // получаем все элементы и очищаем выделения если были
+  const allItems = document.querySelectorAll('.books-item');
+  allItems.forEach((item) => item.classList.remove('highlighted'));
+
+  const searchName = input.trim().toLowerCase();
+
+  const index = books.findIndex((book) =>
+    book.toLowerCase().includes(searchName)
+  );
+
+  if (index !== -1) {
+    allItems[index].classList.add('highlighted');
+  } else {
+    alert('Книга не найдена!');
+  }
+});

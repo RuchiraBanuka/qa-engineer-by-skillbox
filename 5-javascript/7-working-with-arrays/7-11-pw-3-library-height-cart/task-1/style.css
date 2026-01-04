@@ -84,11 +84,14 @@ img {
 }
 
 .books-item {
-  /* background: yellow; */
   padding: 5px 10px;
   font-size: 18px;
 }
 
 .books-item:not(:last-child) {
   margin-bottom: 5px;
+}
+
+.highlighted {
+  background: yellow;
 }
