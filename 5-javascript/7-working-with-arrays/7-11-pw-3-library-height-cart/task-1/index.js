@@ -8,7 +8,6 @@
 - Выполните минимальную CSS-стилизацию DOM-элементов.
 */
 
-const page = document.getElementById('page');
 const books = [
   'Мистер и Маргарита',
   'Гарри Поттер',
@@ -18,33 +17,36 @@ const books = [
   'Отцы и дети',
 ];
 
-const pageHeader = document.createElement('h1');
-pageHeader.classList.add('header');
-pageHeader.textContent = 'Домашняя библиотека';
+const page = document.getElementById('page');
 
-const btnsWrapper = document.createElement('div');
-btnsWrapper.classList.add('btns-wrap');
+const header = document.createElement('h1');
+header.classList.add('header');
+header.textContent = 'Домашняя библиотека';
 
-const addBookBtn = document.createElement('button');
-addBookBtn.classList.add('btn', 'add-btn');
-addBookBtn.textContent = 'Добавить книгу';
+const btnsWrap = document.createElement('div');
+btnsWrap.classList.add('btns-wrap');
 
-const findBookBtn = document.createElement('button');
-findBookBtn.classList.add('btn', 'find-btn');
-findBookBtn.textContent = 'Найти';
+const addBtn = document.createElement('button');
+addBtn.classList.add('btn', 'add-btn');
+addBtn.textContent = 'Добавить книгу';
+
+const findBtn = document.createElement('button');
+findBtn.classList.add('btn', 'find-btn');
+findBtn.textContent = 'Найти';
 
 const booksList = document.createElement('ul');
 booksList.classList.add('books-list');
 
-btnsWrapper.append(addBookBtn, findBookBtn);
-page.append(pageHeader, btnsWrapper, booksList);
+btnsWrap.append(addBtn, findBtn);
+page.append(header, btnsWrap, booksList);
 
+// ** отрисовка списка книг (согласно default массива)
 function renderLibraryList(arr) {
   if (!arr || !Array.isArray(arr)) {
     return;
   }
 
-  booksList.innerHTML = '';
+  booksList.innerHTML = ''; // сразу очистка списка
   const documentFragment = document.createDocumentFragment();
 
   arr.forEach((book, index) => {
@@ -58,52 +60,66 @@ function renderLibraryList(arr) {
   booksList.append(documentFragment);
 }
 
-renderLibraryList(books);
+renderLibraryList(books); // !! запуск отрисовки
 
-addBookBtn.addEventListener('click', () => {
-  const input = prompt('Введи название книги');
-
-  if (input === null) {
-    return;
-  }
-
-  if (input.trim() === '') {
-    alert('Название книги не введено!');
-    return;
-  }
-
-  let bookName = input.trim().toLowerCase();
-  bookName = bookName[0].toUpperCase() + bookName.slice(1);
-
-  books.push(bookName);
-  renderLibraryList(books);
-});
-
-findBookBtn.addEventListener('click', () => {
-  const input = prompt('Введи название книги для поиска');
-
-  if (input === null) {
-    return;
-  }
-
-  if (input.trim() === '') {
-    alert('Название книги не введено!');
-    return;
-  }
-
-  // получаем все элементы и очищаем выделения если были
+// ** очистка выделения книги
+function clearHighlight() {
   const allItems = document.querySelectorAll('.books-item');
   allItems.forEach((item) => item.classList.remove('highlighted'));
+}
 
-  const searchName = input.trim().toLowerCase();
+// ** поиск книги
+function findBooks(booksArr, bookName) {
+  clearHighlight(); // очистка предыдущего выделения
 
-  const index = books.findIndex((book) =>
-    book.toLowerCase().includes(searchName)
+  // определение индекса (совпадения)
+  const index = booksArr.findIndex((book) =>
+    book.toLowerCase().includes(bookName)
   );
 
   if (index !== -1) {
-    allItems[index].classList.add('highlighted');
+    const allItems = document.querySelectorAll('.books-item');
+    allItems[index].classList.add('highlighted'); // выделение книги/элемента через родителя
   } else {
     alert('Книга не найдена!');
   }
+}
+
+// прослушка "Добавить.." кнопки
+addBtn.addEventListener('click', () => {
+  const value = prompt('Введи название книги');
+
+  if (value === null) {
+    return;
+  }
+
+  if (value.trim() === '') {
+    alert('Название книги не введено!');
+    return;
+  }
+
+  let bookName = value.trim().toLowerCase();
+  bookName = bookName[0].toUpperCase() + bookName.slice(1);
+
+  books.push(bookName); // добавление в default массив
+  renderLibraryList(books); // последующая отрисовки/перерисовка
+});
+
+// прослушка "Найти" кнопки
+findBtn.addEventListener('click', () => {
+  const value = prompt('Введи название книги для поиска');
+
+  if (value === null) {
+    return;
+  }
+
+  if (value.trim() === '') {
+    alert('Название книги не введено!');
+    clearHighlight(); // очистка предыдущего выделения
+    return;
+  }
+
+  const searchName = value.trim().toLowerCase();
+
+  findBooks(books, searchName); // запуск поиска книги
 });
